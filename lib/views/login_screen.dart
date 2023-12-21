@@ -1,14 +1,15 @@
+import 'package:chat_app/views/home_screen.dart';
 import 'package:chat_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utilities/constants.dart';
 
-class login_screen extends StatefulWidget {
+class loginScreen extends StatefulWidget {
   @override
-  _login_screenState createState() => _login_screenState();
+  _loginScreenState createState() => _loginScreenState();
 }
 
-class _login_screenState extends State<login_screen> {
+class _loginScreenState extends State<loginScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,7 @@ class _login_screenState extends State<login_screen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: const TextField(
             keyboardType: TextInputType.emailAddress,
             style: TextStyle(
               color: Colors.white,
@@ -113,7 +114,7 @@ class _login_screenState extends State<login_screen> {
           alignment: Alignment.centerLeft,
           decoration: kBoxDecorationStyle,
           height: 60.0,
-          child: TextField(
+          child: const TextField(
             obscureText: true,
             style: TextStyle(
               color: Colors.white,
@@ -140,8 +141,11 @@ class _login_screenState extends State<login_screen> {
       padding: EdgeInsets.symmetric(vertical: 25.0),
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () => print('Giriş Yap Butonuna Tıklandı'),
-        child: Text(
+        onPressed: ()
+        {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => homePage()));
+        },
+        child: const Text(
           'Giriş Yap',
           style: TextStyle(
             color: Color(0xFF527DAA),
@@ -159,10 +163,10 @@ class _login_screenState extends State<login_screen> {
     return GestureDetector(
       onTap: ()
       {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => register_screen()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => registerScreen()));
       },
       child: RichText(
-        text: TextSpan(
+        text: const TextSpan(
           children: [
             TextSpan(
               text: 'Hesabınız Yok mu? ',

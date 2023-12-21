@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../utilities/constants.dart';
 
-class register_screen extends StatefulWidget {
+class registerScreen extends StatefulWidget {
   @override
-  _register_screenState createState() => _register_screenState();
+  _registerScreenState createState() => _registerScreenState();
 }
 
-class _register_screenState extends State<register_screen> {
+class _registerScreenState extends State<registerScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +204,7 @@ class _register_screenState extends State<register_screen> {
       width: double.infinity,
       child: ElevatedButton(
         onPressed: () => print('Giriş Yap Butonuna Tıklandı'),
-        child: Text(
+        child: const Text(
           'Hesap Oluştur',
           style: TextStyle(
             color: Color(0xFF527DAA),
