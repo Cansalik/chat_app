@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:chat_app/views/mydecryptedfiles_screen.dart';
 import 'package:chat_app/views/myencryptedfiles_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
 
 class homePage extends StatefulWidget {
   const homePage({super.key});
@@ -11,6 +14,74 @@ class homePage extends StatefulWidget {
 }
 
 class _homePageState extends State<homePage> {
+
+  File? _selectedFile;
+  TextEditingController tfKey = TextEditingController();
+  VideoPlayerController? _videoController;
+
+  Future<void> _pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      setState(() {
+        _selectedFile = File(result.files.single.path!);
+        _initializeFilePreview();
+      });
+    }
+  }
+
+  void _initializeFilePreview() {
+    if (_selectedFile != null) {
+      if (_selectedFile!.path.endsWith('.mp4')) {
+        _initializeVideoController();
+      }
+    }
+  }
+
+  void _initializeVideoController() {
+    if (_videoController != null) {
+      _videoController!.dispose(); // Eğer varsa önceki video oynatıcıyı serbest bırak
+    }
+
+    _videoController = VideoPlayerController.file(_selectedFile!)
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController!.play(); // Videoyu otomatik olarak başlat
+      });
+
+    _videoController!.addListener(() {
+      if (_videoController!.value.position >= _videoController!.value.duration) {
+        // Video tamamlandığında veya sona erdiğinde isteğe bağlı olarak bir işlem yapabilirsiniz.
+      }
+    });
+  }
+
+  void _uploadFile() async {
+    if (_selectedFile != null || _selectedFile!.path.endsWith('.mp4')) {
+      final url = "http://your-server-url.com/upload"; // Sunucu URL'nizi buraya ekleyin
+
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+      request.files.add(await http.MultipartFile.fromPath('video', _selectedFile!.path));
+
+      try {
+        var response = await request.send();
+        if (response.statusCode == 200) {
+          print('Video başarıyla yüklendi');
+        } else {
+          print('Video yüklenirken bir hata oluştu: ${response.reasonPhrase}');
+        }
+      } catch (error) {
+        print('Video yüklenirken bir hata oluştu: $error');
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -49,7 +120,49 @@ class _homePageState extends State<homePage> {
                   width: 275,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () => print('DOSYA YÜKLE TIKLANDI'),
+                    onPressed: ()
+                    {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: SizedBox(
+                              width: 275,
+                              child: TextField(
+                                controller: tfKey,
+                                decoration: InputDecoration(
+                                  hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
+                                ),
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                              TextButton(
+                                child: Text("Şifrele"),
+                                onPressed: () {
+                                  tfKey.clear();
+                                  _pickFile();
+                                  if (_selectedFile != null)
+                                  {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        backgroundColor: Color(0xff21254A),
+                                        content: Text("Dosya Yüklendi.",
+                                          style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                                        ),
+                                        duration: Duration(milliseconds: 2000),
+                                      ),
+                                    );
+                                    Navigator.pop(context);
+                                  }
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                     child: const Text(
                       'DOSYA YÜKLE',
                       style: TextStyle(
@@ -99,6 +212,7 @@ class _homePageState extends State<homePage> {
                     ),
                   ),
                 ),
+                //_buildFilePreview(),
               ],
             ),
           ),
@@ -106,4 +220,45 @@ class _homePageState extends State<homePage> {
       ),
     );
   }
+
+  Widget _buildFilePreview() {
+    if (_selectedFile == null) {
+      return Container(
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+          ),
+          child: Image.asset("assets/images/empty-folder.png"));
+    } else if (_selectedFile!.path.endsWith('.mp4')) {
+      if (_videoController != null && _videoController!.value.isInitialized) {
+        return Container(
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+          ),
+          child: AspectRatio(
+            aspectRatio: _videoController!.value.aspectRatio,
+            child: VideoPlayer(_videoController!),
+          ),
+        );
+      }
+    } else {
+      return Container(
+        width: 200,
+        height: 200,
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black),
+        ),
+        child: Image.file(
+          _selectedFile!,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return Container(); // Diğer durumlar için boş bir container döndür
+  }
+
 }

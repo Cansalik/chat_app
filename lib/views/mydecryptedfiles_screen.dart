@@ -42,7 +42,7 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
           autofocus: true,
           onChanged: (aramaSonucu) {},
         )
-            : const Text("Listem"),
+            : const Text("Çözülmüş Dosyalarım"),
         actions: [
           _isSearching
               ? IconButton(
@@ -93,8 +93,8 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
                     child: Row(
                       children: [
                         SizedBox(width: 50,height: 50,child: Image.asset("assets/images/folder.png")),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10.0),
+                        const Padding(
+                          padding: EdgeInsets.only(left: 10.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -115,7 +115,6 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
                                   width: 275,
                                   child: TextField(
                                     controller: tfKey,
-                                    keyboardType: TextInputType.number,
                                     decoration: InputDecoration(
                                       hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
                                     ),
@@ -127,7 +126,16 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
                                     child: Text("Şifrele"),
                                     onPressed: ()
                                     {
-                                      print("Şifrelendi");
+                                      tfKey.clear();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                          backgroundColor: Color(0xff21254A),
+                                          content: Text("Dosya şifrelendi.",
+                                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+                                          ),
+                                          duration: Duration(milliseconds: 2000),
+                                        ),
+                                      );
                                       Navigator.pop(context);
                                     },
                                   ),
