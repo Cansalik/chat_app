@@ -38,6 +38,10 @@ dependencies:
   file_picker: ^6.1.1
   video_player: ^2.8.1
   http: ^1.1.2
+  riverpod: ^2.4.9
+  dio: ^5.4.0
+  grock: ^0.5.5
+  flutter_riverpod: ^2.4.9
 
 dev_dependencies:
   flutter_test:

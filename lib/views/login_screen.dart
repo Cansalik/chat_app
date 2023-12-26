@@ -1,15 +1,18 @@
-import 'package:chat_app/views/home_screen.dart';
 import 'package:chat_app/views/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../riverpod/riverpod_management.dart';
 import '../utilities/constants.dart';
 
-class loginScreen extends StatefulWidget {
+class loginScreen extends ConsumerStatefulWidget {
   @override
-  _loginScreenState createState() => _loginScreenState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _LoginState();
 }
 
-class _loginScreenState extends State<loginScreen> {
+class _LoginState extends ConsumerState<loginScreen> {
+  TextEditingController tfEmail = TextEditingController();
+  TextEditingController tfPassword = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +51,7 @@ class _loginScreenState extends State<loginScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                     const Text(
+                      const Text(
                         'Giriş',
                         style: TextStyle(
                           color: Colors.white,
@@ -58,11 +61,115 @@ class _loginScreenState extends State<loginScreen> {
                         ),
                       ),
                       const SizedBox(height: 30.0),
-                      _buildEmailTF(),
                       const SizedBox(height: 30.0,),
-                      _buildPasswordTF(),
-                      _buildLoginBtn(),
-                      _buildSignupBtn(),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 10.0),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            decoration: kBoxDecorationStyle,
+                            height: 60.0,
+                            child: TextField(
+                              keyboardType: TextInputType.emailAddress,
+                              controller: tfEmail,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'OpenSans',
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 14.0),
+                                prefixIcon: Icon(
+                                  Icons.email,
+                                  color: Colors.white,
+                                ),
+                                hintText: 'E Posta',
+                                hintStyle: kHintTextStyle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 10,),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          SizedBox(height: 10.0),
+                          Container(
+                            alignment: Alignment.centerLeft,
+                            decoration: kBoxDecorationStyle,
+                            height: 60.0,
+                            child:TextField(
+                              controller: tfPassword,
+                              obscureText: true,
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'OpenSans',
+                              ),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.only(top: 14.0),
+                                prefixIcon: Icon(
+                                  Icons.lock,
+                                  color: Colors.white,
+                                ),
+                                hintText: 'Şifre',
+                                hintStyle: kHintTextStyle,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 20,),
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 25.0),
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: ()
+                          {
+                            ref.read(loginRiverpod).fetch(tfEmail.text,tfPassword.text);
+                          },
+                          child: const Text(
+                            'Giriş Yap',
+                            style: TextStyle(
+                              color: Color(0xFF527DAA),
+                              letterSpacing: 1.5,
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'OpenSans',
+                            ),
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: ()
+                        {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => registerScreen()));
+                        },
+                        child: RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Hesabınız Yok mu? ',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Üye Olun',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
@@ -74,119 +181,53 @@ class _loginScreenState extends State<loginScreen> {
     );
   }
 
-  Widget _buildEmailTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 60.0,
-          child: const TextField(
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.email,
-                color: Colors.white,
-              ),
-              hintText: 'E Posta',
-              hintStyle: kHintTextStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildPasswordTF() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        SizedBox(height: 10.0),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: kBoxDecorationStyle,
-          height: 60.0,
-          child: const TextField(
-            obscureText: true,
-            style: TextStyle(
-              color: Colors.white,
-              fontFamily: 'OpenSans',
-            ),
-            decoration: InputDecoration(
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.only(top: 14.0),
-              prefixIcon: Icon(
-                Icons.lock,
-                color: Colors.white,
-              ),
-              hintText: 'Şifre',
-              hintStyle: kHintTextStyle,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 
-  Widget _buildLoginBtn() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 25.0),
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: ()
-        {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => homePage()));
-        },
-        child: const Text(
-          'Giriş Yap',
-          style: TextStyle(
-            color: Color(0xFF527DAA),
-            letterSpacing: 1.5,
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-            fontFamily: 'OpenSans',
+
+
+
+
+
+  /*Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Padding(
+          padding: 20.allP,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              TextField(
+                controller: tfEmail,
+                decoration: InputDecoration(
+                  hintText: "E-Mail",
+                  border: OutlineInputBorder(
+                    borderRadius: 10.allBR,
+                  ),
+                ),
+              ),
+              TextField(
+                controller: tfPassword,
+                obscureText: true,
+                decoration: InputDecoration(
+                  hintText: "Şifre",
+                  border: OutlineInputBorder(
+                    borderRadius: 10.allBR,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: Grock.width,
+                child: ElevatedButton(
+                  onPressed: () => ref.read(loginRiverpod).fetch(tfEmail.text,tfPassword.text),
+                  child: const Text(
+                    "Giriş Yap",
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
-  }
-
-  Widget _buildSignupBtn() {
-    return GestureDetector(
-      onTap: ()
-      {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => registerScreen()));
-      },
-      child: RichText(
-        text: const TextSpan(
-          children: [
-            TextSpan(
-              text: 'Hesabınız Yok mu? ',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-            TextSpan(
-              text: 'Üye Olun',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  }*/
 }
