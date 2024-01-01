@@ -53,7 +53,7 @@ class _LoginState extends ConsumerState<registerScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       const Text(
-                        'Giriş',
+                        'Üye Olun',
                         style: TextStyle(
                           color: Colors.white,
                           fontFamily: 'OpenSans',

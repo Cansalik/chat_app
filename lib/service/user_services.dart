@@ -1,14 +1,18 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'package:chat_app/service/API.dart';
+import 'package:chat_app/service/file_services.dart';
+import 'package:chat_app/views/home_screen.dart';
 import 'package:http/http.dart' as http;
 
-class Service {
+class UserServices {
+  api _api = new api();
+  late String token;
 
   Future loginUser(String _email, String _password) async {
-    const url = 'https://fiencrypted.azurewebsites.net/api/v1/user/login';
-    print("$_email-----$_password");
+
+    const subUrl = '/api/v1/user/login';
     var response = await http.post(
-      Uri.parse(url),
+      Uri.parse("${_api.baseUrl}${subUrl}"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": _email,
@@ -19,7 +23,8 @@ class Service {
     {
       var loginArr = json.decode(response.body);
       bool succeded = loginArr["succeded"];
-      print(succeded);
+      token = loginArr["data"]["token"];
+      print(token);
       return succeded;
     }
     else
@@ -28,10 +33,9 @@ class Service {
     }
   }
   Future registerUser(String _email, String _password, String _firstName, String _lastName) async {
-    const url = 'https://fiencrypted.azurewebsites.net/api/v1/user/register';
-    print("$_email---$_password---$_firstName----$_lastName");
+    const subUrl = '/api/v1/user/register';
     var response = await http.post(
-      Uri.parse(url),
+      Uri.parse("${_api.baseUrl}${subUrl}"),
       headers: {"Content-Type": "application/json"},
       body: jsonEncode({
         "email": _email,

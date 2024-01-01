@@ -1,13 +1,15 @@
 import 'dart:io';
+import 'package:chat_app/service/file_services.dart';
 import 'package:chat_app/views/mydecryptedfiles_screen.dart';
 import 'package:chat_app/views/myencryptedfiles_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:grock/grock.dart';
 import 'package:video_player/video_player.dart';
-import 'package:http/http.dart' as http;
 
 class homePage extends StatefulWidget {
   const homePage({super.key});
+
 
   @override
   State<homePage> createState() => _homePageState();
@@ -15,8 +17,10 @@ class homePage extends StatefulWidget {
 
 class _homePageState extends State<homePage> {
 
+  FileServices fileServices = new FileServices();
   File? _selectedFile;
   TextEditingController tfKey = TextEditingController();
+  TextEditingController tfVideoName = TextEditingController();
   VideoPlayerController? _videoController;
 
   Future<void> _pickFile() async {
@@ -25,54 +29,54 @@ class _homePageState extends State<homePage> {
     if (result != null) {
       setState(() {
         _selectedFile = File(result.files.single.path!);
-        _initializeFilePreview();
       });
-    }
-  }
 
-  void _initializeFilePreview() {
-    if (_selectedFile != null) {
-      if (_selectedFile!.path.endsWith('.mp4')) {
-        _initializeVideoController();
+      if(_selectedFile != null)
+      {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              content: Column(
+                children: [
+                  TextField(
+                    controller: tfKey,
+                    decoration: InputDecoration(
+                      hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
+                    ),
+                  ),
+                  TextField(
+                    controller: tfVideoName,
+                    decoration: InputDecoration(
+                      hintText: "Video Adı ?",
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                TextButton(
+                  child: Text("Şifrele"),
+                  onPressed: () {_uploadFile();},
+                ),
+              ],
+            );
+          },
+        );
+      }
+      else
+      {
+        Grock.snackBar(title: "Hata", description: "Dosya Yükelnirken Hata Oluştu", color: Colors.red);
       }
     }
   }
 
-  void _initializeVideoController() {
-    if (_videoController != null) {
-      _videoController!.dispose(); // Eğer varsa önceki video oynatıcıyı serbest bırak
-    }
 
-    _videoController = VideoPlayerController.file(_selectedFile!)
-      ..initialize().then((_) {
-        setState(() {});
-        _videoController!.play(); // Videoyu otomatik olarak başlat
-      });
-
-    _videoController!.addListener(() {
-      if (_videoController!.value.position >= _videoController!.value.duration) {
-        // Video tamamlandığında veya sona erdiğinde isteğe bağlı olarak bir işlem yapabilirsiniz.
-      }
-    });
-  }
 
   void _uploadFile() async {
-    if (_selectedFile != null || _selectedFile!.path.endsWith('.mp4')) {
-      final url = "http://your-server-url.com/upload"; // Sunucu URL'nizi buraya ekleyin
-
-      var request = http.MultipartRequest('POST', Uri.parse(url));
-      request.files.add(await http.MultipartFile.fromPath('video', _selectedFile!.path));
-
-      try {
-        var response = await request.send();
-        if (response.statusCode == 200) {
-          print('Video başarıyla yüklendi');
-        } else {
-          print('Video yüklenirken bir hata oluştu: ${response.reasonPhrase}');
-        }
-      } catch (error) {
-        print('Video yüklenirken bir hata oluştu: $error');
-      }
+    if (_selectedFile != null && _selectedFile!.path.endsWith('.mp4')) {
+      fileServices.uploadVideo(tfVideoName.text, tfKey.text, _selectedFile!.path,"token");
     }
   }
 
@@ -122,28 +126,30 @@ class _homePageState extends State<homePage> {
                   child: ElevatedButton(
                     onPressed: ()
                     {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: SizedBox(
-                              width: 275,
-                              child: TextField(
-                                controller: tfKey,
-                                decoration: InputDecoration(
-                                  hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
+                      _pickFile();
+                      if(_selectedFile != null)
+                      {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: SizedBox(
+                                width: 275,
+                                child: TextField(
+                                  controller: tfKey,
+                                  decoration: InputDecoration(
+                                    hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
+                                  ),
                                 ),
                               ),
-                            ),
-                            actions: [
-                              TextButton(
-                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                              TextButton(
-                                child: Text("Şifrele"),
-                                onPressed: () {
-                                  tfKey.clear();
-                                  _pickFile();
-                                  if (_selectedFile != null)
+                              actions: [
+                                TextButton(
+                                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                                TextButton(
+                                  child: Text("Şifrele"),
+                                  onPressed: () {
+
+                                    /* if (_selectedFile != null)
                                   {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
@@ -154,14 +160,14 @@ class _homePageState extends State<homePage> {
                                         duration: Duration(milliseconds: 2000),
                                       ),
                                     );
-                                    Navigator.pop(context);
-                                  }
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
+                                  }*/
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
                     },
                     child: const Text(
                       'DOSYA YÜKLE',
@@ -261,4 +267,34 @@ class _homePageState extends State<homePage> {
     return Container(); // Diğer durumlar için boş bir container döndür
   }
 
+
+
+  /*
+  *
+  *  void _initializeFilePreview() {
+    if (_selectedFile != null) {
+      if (_selectedFile!.path.endsWith('.mp4')) {
+        _initializeVideoController();
+      }
+    }
+  }
+
+  void _initializeVideoController() {
+    if (_videoController != null) {
+      _videoController!.dispose(); // Eğer varsa önceki video oynatıcıyı serbest bırak
+    }
+
+    _videoController = VideoPlayerController.file(_selectedFile!)
+      ..initialize().then((_) {
+        setState(() {});
+        _videoController!.play(); // Videoyu otomatik olarak başlat
+      });
+
+    _videoController!.addListener(() {
+      if (_videoController!.value.position >= _videoController!.value.duration) {
+        // Video tamamlandığında veya sona erdiğinde isteğe bağlı olarak bir işlem yapabilirsiniz.
+      }
+    });
+  }
+  * */
 }
