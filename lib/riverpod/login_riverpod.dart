@@ -12,7 +12,7 @@ class LoginRiverpod extends ChangeNotifier {
       if(value != null)
       {
         Grock.snackBar(title: "Giriş Başarılı", description: "");
-        Grock.toRemove(homePage());
+        Grock.toRemove(homePage(token: value));
       }
       else
       {

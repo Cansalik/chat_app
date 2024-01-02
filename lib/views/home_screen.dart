@@ -1,90 +1,158 @@
-import 'dart:io';
-import 'package:chat_app/service/file_services.dart';
+import 'dart:convert';
+import 'package:chat_app/service/user_services.dart';
 import 'package:chat_app/views/mydecryptedfiles_screen.dart';
 import 'package:chat_app/views/myencryptedfiles_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:grock/grock.dart';
-import 'package:video_player/video_player.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:image_picker/image_picker.dart';
 
 class homePage extends StatefulWidget {
-  const homePage({super.key});
-
+  homePage({super.key, required this.token});
+  final String token;
 
   @override
   State<homePage> createState() => _homePageState();
 }
 
 class _homePageState extends State<homePage> {
-
-  FileServices fileServices = new FileServices();
-  File? _selectedFile;
   TextEditingController tfKey = TextEditingController();
-  TextEditingController tfVideoName = TextEditingController();
-  VideoPlayerController? _videoController;
+  TextEditingController tfFileName = TextEditingController();
 
-  Future<void> _pickFile() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles();
+  Future<void> uploadVideo(String _title, String _pass, String _token) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickVideo(source: ImageSource.gallery);
 
-    if (result != null) {
-      setState(() {
-        _selectedFile = File(result.files.single.path!);
+    if (pickedFile == null)
+    {
+      print("Video seçilmedi.");
+      return;
+    }
+
+    try {
+      Dio dio = Dio();
+      String apiEndpoint = "https://aes-project-one.azurewebsites.net/api/v1/file/file-encrption";
+
+      FormData formData = FormData.fromMap({
+        "title": _title,
+        "pass": _pass,
+        "video": await MultipartFile.fromFile(
+          pickedFile.path,
+          filename: "video.mp4",
+          contentType: MediaType('video', 'mp4'),
+        ),
       });
 
-      if(_selectedFile != null)
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'multipart/form-data',
+        },
+      );
+
+      Response response = await dio.post(
+        apiEndpoint,
+        data: formData,
+        options: options,
+      );
+      final Map<String, dynamic> data = json.decode(response.toString());
+      print("Response Data: $data");
+
+      if (response.statusCode == 200)
       {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              content: Column(
-                children: [
-                  TextField(
-                    controller: tfKey,
-                    decoration: InputDecoration(
-                      hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
-                    ),
-                  ),
-                  TextField(
-                    controller: tfVideoName,
-                    decoration: InputDecoration(
-                      hintText: "Video Adı ?",
-                    ),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                TextButton(
-                  child: Text("Şifrele"),
-                  onPressed: () {_uploadFile();},
-                ),
-              ],
-            );
-          },
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xff21254A),
+            content: Text("Dosya Yüklendi.",
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+            ),
+            duration: Duration(milliseconds: 2000),
+          ),
+        );
+      } else
+      {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xff21254A),
+            content: Text("Bilinmeyen Hata.",
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+            ),
+            duration: Duration(milliseconds: 2000),
+          ),
         );
       }
-      else
+    } catch (e) {
+      print("Hata oluştu: $e");
+    }
+  }
+
+  Future<void> uploadImage(String _title, String _pass, String _token) async {
+    final picker = ImagePicker();
+    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null)
+    {
+      print("Fotoğraf seçilmedi.");
+      return;
+    }
+
+    try {
+      Dio dio = Dio();
+      String apiEndpoint = "https://aes-project-one.azurewebsites.net/api/v1/file/image-encrption";
+
+      FormData formData = FormData.fromMap({
+        "title": _title,
+        "pass": _pass,
+        "image": await MultipartFile.fromFile(
+          pickedFile.path,
+          filename: "image.jpg",
+          contentType: MediaType('image', 'jpg'),
+        ),
+      });
+
+      Options options = Options(
+        headers: {
+          'Authorization': 'Bearer $_token',
+          'Content-Type': 'multipart/form-data',
+        },
+      );
+
+      Response response = await dio.post(
+        apiEndpoint,
+        data: formData,
+        options: options,
+      );
+      final Map<String, dynamic> data = json.decode(response.toString());
+      print("Response Data: $data");
+
+      if (response.statusCode == 200)
       {
-        Grock.snackBar(title: "Hata", description: "Dosya Yükelnirken Hata Oluştu", color: Colors.red);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xff21254A),
+            content: Text("Dosya Yüklendi.",
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+            ),
+            duration: Duration(milliseconds: 2000),
+          ),
+        );
+      } else
+      {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Color(0xff21254A),
+            content: Text("Bilinmeyen Hata.",
+              style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
+            ),
+            duration: Duration(milliseconds: 2000),
+          ),
+        );
       }
+    } catch (e) {
+      print("Hata oluştu: $e");
     }
   }
 
-
-
-  void _uploadFile() async {
-    if (_selectedFile != null && _selectedFile!.path.endsWith('.mp4')) {
-      fileServices.uploadVideo(tfVideoName.text, tfKey.text, _selectedFile!.path,"token");
-    }
-  }
-
-  @override
-  void dispose() {
-    _videoController?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -126,51 +194,105 @@ class _homePageState extends State<homePage> {
                   child: ElevatedButton(
                     onPressed: ()
                     {
-                      _pickFile();
-                      if(_selectedFile != null)
-                      {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              content: SizedBox(
-                                width: 275,
-                                child: TextField(
-                                  controller: tfKey,
-                                  decoration: InputDecoration(
-                                    hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: SizedBox(
+                              width: 275,
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    controller: tfKey,
+                                    decoration: InputDecoration(
+                                      hintText: "Anahtar kelime ?",
+                                    ),
                                   ),
-                                ),
+                                  TextField(
+                                    controller: tfFileName,
+                                    decoration: InputDecoration(
+                                      hintText: "Dosya Adı ?",
+                                    ),
+                                  ),
+                                ],
                               ),
-                              actions: [
-                                TextButton(
-                                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                                TextButton(
-                                  child: Text("Şifrele"),
-                                  onPressed: () {
-
-                                    /* if (_selectedFile != null)
-                                  {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        backgroundColor: Color(0xff21254A),
-                                        content: Text("Dosya Yüklendi.",
-                                          style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                                        ),
-                                        duration: Duration(milliseconds: 2000),
-                                      ),
-                                    );
-                                  }*/
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      }
+                            ),
+                            actions: [
+                              TextButton(
+                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                              TextButton(
+                                child: Text("Şifrele"),
+                                onPressed: () {
+                                  uploadVideo(tfFileName.text, tfKey.text, widget.token);
+                                  Navigator.pop(context);
+                                  tfFileName.clear();
+                                  tfKey.clear();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     },
                     child: const Text(
-                      'DOSYA YÜKLE',
+                      'VİDEO YÜKLE',
+                      style: TextStyle(
+                        color: Color(0xFF527DAA),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'OpenSans',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 275,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: ()
+                    {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            content: SizedBox(
+                              width: 275,
+                              child: Column(
+                                children: [
+                                  TextField(
+                                    controller: tfKey,
+                                    decoration: InputDecoration(
+                                      hintText: "Anahtar kelime ?",
+                                    ),
+                                  ),
+                                  TextField(
+                                    controller: tfFileName,
+                                    decoration: InputDecoration(
+                                      hintText: "Dosya Adı ?",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                              TextButton(
+                                child: Text("Şifrele"),
+                                onPressed: () {
+                                  uploadImage(tfFileName.text, tfKey.text, widget.token);
+                                  Navigator.pop(context);
+                                  tfFileName.clear();
+                                  tfKey.clear();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                    child: const Text(
+                      'FOTOĞRAF YÜKLE',
                       style: TextStyle(
                         color: Color(0xFF527DAA),
                         fontSize: 18.0,
@@ -226,75 +348,4 @@ class _homePageState extends State<homePage> {
       ),
     );
   }
-
-  Widget _buildFilePreview() {
-    if (_selectedFile == null) {
-      return Container(
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-          ),
-          child: Image.asset("assets/images/empty-folder.png"));
-    } else if (_selectedFile!.path.endsWith('.mp4')) {
-      if (_videoController != null && _videoController!.value.isInitialized) {
-        return Container(
-          width: 200,
-          height: 200,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black),
-          ),
-          child: AspectRatio(
-            aspectRatio: _videoController!.value.aspectRatio,
-            child: VideoPlayer(_videoController!),
-          ),
-        );
-      }
-    } else {
-      return Container(
-        width: 200,
-        height: 200,
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black),
-        ),
-        child: Image.file(
-          _selectedFile!,
-          fit: BoxFit.cover,
-        ),
-      );
-    }
-
-    return Container(); // Diğer durumlar için boş bir container döndür
-  }
-
-
-
-  /*
-  *
-  *  void _initializeFilePreview() {
-    if (_selectedFile != null) {
-      if (_selectedFile!.path.endsWith('.mp4')) {
-        _initializeVideoController();
-      }
-    }
-  }
-
-  void _initializeVideoController() {
-    if (_videoController != null) {
-      _videoController!.dispose(); // Eğer varsa önceki video oynatıcıyı serbest bırak
-    }
-
-    _videoController = VideoPlayerController.file(_selectedFile!)
-      ..initialize().then((_) {
-        setState(() {});
-        _videoController!.play(); // Videoyu otomatik olarak başlat
-      });
-
-    _videoController!.addListener(() {
-      if (_videoController!.value.position >= _videoController!.value.duration) {
-        // Video tamamlandığında veya sona erdiğinde isteğe bağlı olarak bir işlem yapabilirsiniz.
-      }
-    });
-  }
-  * */
 }

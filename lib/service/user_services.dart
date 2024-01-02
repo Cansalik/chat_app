@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'package:chat_app/service/API.dart';
-import 'package:chat_app/service/file_services.dart';
-import 'package:chat_app/views/home_screen.dart';
 import 'package:http/http.dart' as http;
 
 class UserServices {
@@ -22,10 +20,9 @@ class UserServices {
     if (response.statusCode == 200)
     {
       var loginArr = json.decode(response.body);
-      bool succeded = loginArr["succeded"];
       token = loginArr["data"]["token"];
-      print(token);
-      return succeded;
+      print("User services Token: $token");
+      return token;
     }
     else
     {

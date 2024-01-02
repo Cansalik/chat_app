@@ -42,6 +42,8 @@ dependencies:
   dio: ^5.4.0
   grock: ^0.5.5
   flutter_riverpod: ^2.4.9
+  image_picker: ^1.0.5
+  http_parser: ^4.0.2
 
 dev_dependencies:
   flutter_test:
