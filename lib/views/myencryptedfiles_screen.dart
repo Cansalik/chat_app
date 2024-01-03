@@ -1,9 +1,11 @@
+import 'package:chat_app/views/myencryptedphoto_screen.dart';
+import 'package:chat_app/views/myencryptedvideo_screen.dart';
 import 'package:flutter/material.dart';
 
 class myEncryptedFilesScreen extends StatefulWidget {
-  const myEncryptedFilesScreen({Key? key}) : super(key: key);
+  myEncryptedFilesScreen({Key? key, required this.token}) : super(key: key);
 
-  @override
+  final String token;@override
   State<myEncryptedFilesScreen> createState() => _myEncryptedFilesScreenState();
 }
 
@@ -31,36 +33,7 @@ class _myEncryptedFilesScreenState extends State<myEncryptedFilesScreen> {
             ),
           ),
         ),
-        title: _isSearching
-            ? TextField(
-          style: TextStyle(color: Colors.black),
-          decoration: const InputDecoration(
-            hintText: "Ara",
-            hintStyle: TextStyle(color: Colors.black),
-          ),
-          autofocus: true,
-          onChanged: (aramaSonucu) {},
-        )
-            : const Text("Listem"),
-        actions: [
-          _isSearching
-              ? IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = false;
-              });
-            },
-            icon: Icon(Icons.cancel),
-          )
-              : IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = true;
-              });
-            },
-            icon: Icon(Icons.search),
-          )
-        ],
+        title: Text("Dosya Türü seçin")
       ),
       body: Stack(
         children: [
@@ -81,69 +54,43 @@ class _myEncryptedFilesScreenState extends State<myEncryptedFilesScreen> {
               ),
             ),
           ),
-          // ListView eklenmiş kısım
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 50,height: 50,child: Image.asset("assets/images/folder.png")),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Dosya İsmi",style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
-                              SizedBox(height: 5,),
-                              Text("Yüklenme Tarihi",style: TextStyle(fontSize: 16,color: Colors.blue),),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(onPressed: ()
-                        {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: SizedBox(
-                                  width: 225,
-                                  child: TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Anahatar Kelime ?",
-                                    ),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                                  TextButton(
-                                    child: Text("Dosyayı Aç"),
-                                    onPressed: ()
-                                    {
-                                      tfKey.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          backgroundColor: Color(0xff21254A),
-                                          content: Text("Dosyanın şifresi çözüldü..",
-                                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                                          ),
-                                          duration: Duration(milliseconds: 2000),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }, icon: Icon(Icons.lock_open),color: Colors.green[400],),
-                      ],
+                SizedBox(
+                  width: 275,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => myEncryptedVideos(token: widget.token)));
+                    },
+                    child: const Text(
+                      'ŞİFRELİ VİDEOLAR',
+                      style: TextStyle(
+                        color: Color(0xFF527DAA),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'OpenSans',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 275,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => myEncryptedPhotos(token: widget.token)));
+                    },
+                    child: const Text(
+                      'ŞİFRELİ FOTOĞRAFLAR',
+                      style: TextStyle(
+                        color: Color(0xFF527DAA),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'OpenSans',
+                      ),
                     ),
                   ),
                 ),

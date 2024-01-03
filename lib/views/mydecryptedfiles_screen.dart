@@ -1,8 +1,13 @@
+import 'package:chat_app/views/mydecryptedphoto_screen.dart';
+import 'package:chat_app/views/mydecryptedvideo_screen.dart';
+import 'package:chat_app/views/myencryptedphoto_screen.dart';
+import 'package:chat_app/views/myencryptedvideo_screen.dart';
 import 'package:flutter/material.dart';
 
 class myDecryptedFilesScreen extends StatefulWidget {
-  const myDecryptedFilesScreen({super.key});
+  myDecryptedFilesScreen({Key? key, required this.token}) : super(key: key);
 
+  final String token;
   @override
   State<myDecryptedFilesScreen> createState() => _myDecryptedFilesScreenState();
 }
@@ -12,56 +17,26 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
 
   TextEditingController tfKey = TextEditingController();
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF73AEF5),
-                Color(0xFF61A4F1),
-                Color(0xFF478DE0),
-                Color(0xFF398AE5),
-              ],
-              stops: [0.1, 0.4, 0.7, 0.9],
-              begin: Alignment.bottomCenter,
-              end: Alignment.topCenter,
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF73AEF5),
+                  Color(0xFF61A4F1),
+                  Color(0xFF478DE0),
+                  Color(0xFF398AE5),
+                ],
+                stops: [0.1, 0.4, 0.7, 0.9],
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+              ),
             ),
           ),
-        ),
-        title: _isSearching
-            ? TextField(
-          style: TextStyle(color: Colors.black),
-          decoration: const InputDecoration(
-            hintText: "Ara",
-            hintStyle: TextStyle(color: Colors.black),
-          ),
-          autofocus: true,
-          onChanged: (aramaSonucu) {},
-        )
-            : const Text("Çözülmüş Dosyalarım"),
-        actions: [
-          _isSearching
-              ? IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = false;
-              });
-            },
-            icon: Icon(Icons.cancel),
-          )
-              : IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = true;
-              });
-            },
-            icon: Icon(Icons.search),
-          )
-        ],
+          title: Text("Dosya Türü seçin")
       ),
       body: Stack(
         children: [
@@ -82,69 +57,43 @@ class _myDecryptedFilesScreenState extends State<myDecryptedFilesScreen> {
               ),
             ),
           ),
-          // ListView eklenmiş kısım
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ListView(
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      children: [
-                        SizedBox(width: 50,height: 50,child: Image.asset("assets/images/folder.png")),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Dosya İsmi",style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
-                              SizedBox(height: 5,),
-                              Text("Yüklenme Tarihi",style: TextStyle(fontSize: 16,color: Colors.blue),),
-                            ],
-                          ),
-                        ),
-                        Spacer(),
-                        IconButton(onPressed: ()
-                        {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: SizedBox(
-                                  width: 275,
-                                  child: TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
-                                    ),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                                  TextButton(
-                                    child: Text("Şifrele"),
-                                    onPressed: ()
-                                    {
-                                      tfKey.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          backgroundColor: Color(0xff21254A),
-                                          content: Text("Dosya şifrelendi.",
-                                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                                          ),
-                                          duration: Duration(milliseconds: 2000),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }, icon: Icon(Icons.lock),color: Colors.red[400],),
-                      ],
+                SizedBox(
+                  width: 275,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => myDecryptedVideos(token: widget.token)));
+                    },
+                    child: const Text(
+                      'ÇÖZÜLMÜŞ VİDEOLAR',
+                      style: TextStyle(
+                        color: Color(0xFF527DAA),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'OpenSans',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 275,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: (){
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => myDecryptedPhotos(token: widget.token,)));
+                    },
+                    child: const Text(
+                      'ÇÖZÜLMÜŞ FOTOĞRAFLAR',
+                      style: TextStyle(
+                        color: Color(0xFF527DAA),
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'OpenSans',
+                      ),
                     ),
                   ),
                 ),

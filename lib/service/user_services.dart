@@ -1,10 +1,11 @@
 import 'dart:convert';
+import 'package:chat_app/models/login_model.dart';
 import 'package:chat_app/service/API.dart';
 import 'package:http/http.dart' as http;
 
 class UserServices {
-  api _api = new api();
-  late String token;
+  Api _api = new Api();
+  late String token,id;
 
   Future loginUser(String _email, String _password) async {
 
@@ -21,7 +22,6 @@ class UserServices {
     {
       var loginArr = json.decode(response.body);
       token = loginArr["data"]["token"];
-      print("User services Token: $token");
       return token;
     }
     else

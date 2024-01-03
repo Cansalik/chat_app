@@ -10,7 +10,6 @@ import 'package:image_picker/image_picker.dart';
 class homePage extends StatefulWidget {
   homePage({super.key, required this.token});
   final String token;
-
   @override
   State<homePage> createState() => _homePageState();
 }
@@ -95,11 +94,10 @@ class _homePageState extends State<homePage> {
       print("Fotoğraf seçilmedi.");
       return;
     }
-
+    print("Token2: $_token");
     try {
       Dio dio = Dio();
       String apiEndpoint = "https://aes-project-one.azurewebsites.net/api/v1/file/image-encrption";
-
       FormData formData = FormData.fromMap({
         "title": _title,
         "pass": _pass,
@@ -199,6 +197,7 @@ class _homePageState extends State<homePage> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             content: SizedBox(
+                              height: 150,
                               width: 275,
                               child: Column(
                                 children: [
@@ -256,6 +255,7 @@ class _homePageState extends State<homePage> {
                         builder: (BuildContext context) {
                           return AlertDialog(
                             content: SizedBox(
+                              height: 150,
                               width: 275,
                               child: Column(
                                 children: [
@@ -308,7 +308,7 @@ class _homePageState extends State<homePage> {
                   child: ElevatedButton(
                     onPressed: ()
                     {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myEncryptedFilesScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myEncryptedFilesScreen(token: widget.token)));
                     },
                     child: const Text(
                       'ŞİFRELİ DOSYALARIM',
@@ -327,7 +327,7 @@ class _homePageState extends State<homePage> {
                   child: ElevatedButton(
                     onPressed: ()
                     {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myDecryptedFilesScreen()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myDecryptedFilesScreen(token: widget.token,)));
                     },
                     child: const Text(
                       'ÇÖZÜLMÜŞ DOSYALARIM',

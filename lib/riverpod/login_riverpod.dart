@@ -1,3 +1,4 @@
+import 'package:chat_app/models/login_model.dart';
 import 'package:chat_app/views/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:grock/grock.dart';
