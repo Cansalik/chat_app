@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:video_player/video_player.dart';
 import '../service/API.dart';
 import 'package:http/http.dart' as http;
@@ -52,6 +53,7 @@ class _myDecryptedVideosState extends State<myDecryptedVideos> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        title: const Text("Çözülmüş Videolar"),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -67,36 +69,6 @@ class _myDecryptedVideosState extends State<myDecryptedVideos> {
             ),
           ),
         ),
-        title: _isSearching
-            ? TextField(
-          style: TextStyle(color: Colors.black),
-          decoration: const InputDecoration(
-            hintText: "Ara",
-            hintStyle: TextStyle(color: Colors.black),
-          ),
-          autofocus: true,
-          onChanged: (aramaSonucu) {},
-        )
-            : const Text("Çözülmüş Fotoğraflar"),
-        actions: [
-          _isSearching
-              ? IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = false;
-              });
-            },
-            icon: Icon(Icons.cancel),
-          )
-              : IconButton(
-            onPressed: () {
-              setState(() {
-                _isSearching = true;
-              });
-            },
-            icon: Icon(Icons.search),
-          )
-        ],
       ),
       body: Stack(
         children: [
@@ -131,7 +103,6 @@ class _myDecryptedVideosState extends State<myDecryptedVideos> {
                       children: [
                         InkWell(
                           onTap: () {
-                            // Video URL'sini alın ve oynatıcıyı başlatın
                             String videoUrl = videoList[index]['video_url'];
                             _playVideo(videoUrl);
                           },
@@ -148,50 +119,10 @@ class _myDecryptedVideosState extends State<myDecryptedVideos> {
                             children: [
                               Text(videoList[index]['title'],style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
                               SizedBox(height: 5,),
-                              Text(videoList[index]['createdAt'],style: TextStyle(fontSize: 16,color: Colors.blue),),
+                              Text("${DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(videoList[index]['createdAt']))}",style: TextStyle(fontSize: 16,color: Colors.blue),),
                             ],
                           ),
                         ),
-                        Spacer(),
-                        IconButton(onPressed: ()
-                        {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: SizedBox(
-                                  width: 275,
-                                  child: TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
-                                    ),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                                  TextButton(
-                                    child: Text("Şifrele"),
-                                    onPressed: ()
-                                    {
-                                      tfKey.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          backgroundColor: Color(0xff21254A),
-                                          content: Text("Dosya şifrelendi.",
-                                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                                          ),
-                                          duration: Duration(milliseconds: 2000),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }, icon: Icon(Icons.lock),color: Colors.red[400],),
                       ],
                     ),
                   ),

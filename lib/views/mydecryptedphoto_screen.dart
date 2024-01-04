@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../service/API.dart';
 import 'package:http/http.dart' as http;
 
@@ -102,7 +103,7 @@ class _myDecryptedPhotosState extends State<myDecryptedPhotos> {
                         InkWell(
                           onTap: () {
                             // Fotoğrafı göster
-                            String imageUrl = photoList[index]['image_url'];
+                            String imageUrl = "${photoList[index]['image_url']}";
                             _showImage(imageUrl);
                           },
                           child: SizedBox(
@@ -117,50 +118,10 @@ class _myDecryptedPhotosState extends State<myDecryptedPhotos> {
                             children: [
                               Text(photoList[index]['title'],style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
                               SizedBox(height: 5,),
-                              Text(photoList[index]['createdAt'],style: TextStyle(fontSize: 16,color: Colors.blue),),
+                              Text("${DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(photoList[index]['createdAt']))}",style: TextStyle(fontSize: 16,color: Colors.blue),),
                             ],
                           ),
                         ),
-                        Spacer(),
-                        IconButton(onPressed: ()
-                        {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                content: SizedBox(
-                                  width: 275,
-                                  child: TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Şifrelemek İçin Anahtar Kelime Girin.",
-                                    ),
-                                  ),
-                                ),
-                                actions: [
-                                  TextButton(child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                                  TextButton(
-                                    child: Text("Şifrele"),
-                                    onPressed: ()
-                                    {
-                                      tfKey.clear();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          backgroundColor: Color(0xff21254A),
-                                          content: Text("Dosya şifrelendi.",
-                                            style: TextStyle(color: Colors.white,fontWeight: FontWeight.bold),
-                                          ),
-                                          duration: Duration(milliseconds: 2000),
-                                        ),
-                                      );
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-                        }, icon: Icon(Icons.lock),color: Colors.red[400],),
                       ],
                     ),
                   ),
@@ -179,9 +140,26 @@ class _myDecryptedPhotosState extends State<myDecryptedPhotos> {
       builder: (BuildContext context) {
         return AlertDialog(
           content: SizedBox(
-            width: 275,
-            height: 275,
-            child: Image.network(imageUrl),
+            width: 300,
+            height: 500,
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.contain,
+              loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                print(loadingProgress);
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
+              errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                return Center(child: const Text('Resim Yüklenirken Hata Oluştu.')); // Hata durumunda gösterilecek metin
+              },
+            ),
           ),
           actions: [
             TextButton(
@@ -195,5 +173,4 @@ class _myDecryptedPhotosState extends State<myDecryptedPhotos> {
       },
     );
   }
-
 }

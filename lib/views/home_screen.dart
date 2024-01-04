@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:chat_app/service/user_services.dart';
+import 'package:chat_app/views/login_screen.dart';
 import 'package:chat_app/views/mydecryptedfiles_screen.dart';
 import 'package:chat_app/views/myencryptedfiles_screen.dart';
 import 'package:dio/dio.dart';
@@ -151,200 +152,206 @@ class _homePageState extends State<homePage> {
     }
   }
 
+  Future<bool> goToLoginScreen(BuildContext context) async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => loginScreen()));
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Color(0xFF73AEF5),
-                  Color(0xFF61A4F1),
-                  Color(0xFF478DE0),
-                  Color(0xFF398AE5),
-                ], stops: [0.1, 0.4, 0.7, 0.9],
+    return WillPopScope(
+      onWillPop: ()=> goToLoginScreen(context),
+      child: Scaffold(
+        body: Stack(
+          children: <Widget>[
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF73AEF5),
+                    Color(0xFF61A4F1),
+                    Color(0xFF478DE0),
+                    Color(0xFF398AE5),
+                  ], stops: [0.1, 0.4, 0.7, 0.9],
+                ),
               ),
             ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Text(
-                  'İşleminizi seçin',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontFamily: 'OpenSans',
-                    fontSize: 48.0,
-                    fontWeight: FontWeight.bold,
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Text(
+                    'İşleminizi seçin',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'OpenSans',
+                      fontSize: 48.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 275,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: ()
-                    {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: SizedBox(
-                              height: 150,
-                              width: 275,
-                              child: Column(
-                                children: [
-                                  TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Anahtar kelime ?",
+                  SizedBox(
+                    width: 275,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: ()
+                      {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: SizedBox(
+                                height: 150,
+                                width: 275,
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: tfFileName,
+                                      decoration: InputDecoration(
+                                        hintText: "Dosya Adı ?",
+                                      ),
                                     ),
-                                  ),
-                                  TextField(
-                                    controller: tfFileName,
-                                    decoration: InputDecoration(
-                                      hintText: "Dosya Adı ?",
+                                    TextField(
+                                      controller: tfKey,
+                                      decoration: InputDecoration(
+                                        hintText: "Anahtar Kelime ?",
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            actions: [
-                              TextButton(
-                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                              TextButton(
-                                child: Text("Şifrele"),
-                                onPressed: () {
-                                  uploadVideo(tfFileName.text, tfKey.text, widget.token);
-                                  Navigator.pop(context);
-                                  tfFileName.clear();
-                                  tfKey.clear();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: const Text(
-                      'VİDEO YÜKLE',
-                      style: TextStyle(
-                        color: Color(0xFF527DAA),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'OpenSans',
+                              actions: [
+                                TextButton(
+                                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                                TextButton(
+                                  child: Text("Şifrele"),
+                                  onPressed: () {
+                                    uploadVideo(tfFileName.text, tfKey.text, widget.token);
+                                    Navigator.pop(context);
+                                    tfFileName.clear();
+                                    tfKey.clear();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text(
+                        'VİDEO YÜKLE',
+                        style: TextStyle(
+                          color: Color(0xFF527DAA),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 275,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: ()
-                    {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            content: SizedBox(
-                              height: 150,
-                              width: 275,
-                              child: Column(
-                                children: [
-                                  TextField(
-                                    controller: tfKey,
-                                    decoration: InputDecoration(
-                                      hintText: "Anahtar kelime ?",
+                  SizedBox(
+                    width: 275,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: ()
+                      {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              content: SizedBox(
+                                height: 150,
+                                width: 275,
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: tfFileName,
+                                      decoration: InputDecoration(
+                                        hintText: "Dosya Adı ?",
+                                      ),
                                     ),
-                                  ),
-                                  TextField(
-                                    controller: tfFileName,
-                                    decoration: InputDecoration(
-                                      hintText: "Dosya Adı ?",
+                                    TextField(
+                                      controller: tfKey,
+                                      decoration: InputDecoration(
+                                        hintText: "Anahtar Kelime ?",
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
-                            ),
-                            actions: [
-                              TextButton(
-                                  child: Text("İptal"), onPressed: () => Navigator.pop(context)),
-                              TextButton(
-                                child: Text("Şifrele"),
-                                onPressed: () {
-                                  uploadImage(tfFileName.text, tfKey.text, widget.token);
-                                  Navigator.pop(context);
-                                  tfFileName.clear();
-                                  tfKey.clear();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: const Text(
-                      'FOTOĞRAF YÜKLE',
-                      style: TextStyle(
-                        color: Color(0xFF527DAA),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'OpenSans',
+                              actions: [
+                                TextButton(
+                                    child: Text("İptal"), onPressed: () => Navigator.pop(context)),
+                                TextButton(
+                                  child: Text("Şifrele"),
+                                  onPressed: () {
+                                    uploadImage(tfFileName.text, tfKey.text, widget.token);
+                                    Navigator.pop(context);
+                                    tfFileName.clear();
+                                    tfKey.clear();
+                                  },
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                      child: const Text(
+                        'FOTOĞRAF YÜKLE',
+                        style: TextStyle(
+                          color: Color(0xFF527DAA),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 275,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: ()
-                    {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myEncryptedFilesScreen(token: widget.token)));
-                    },
-                    child: const Text(
-                      'ŞİFRELİ DOSYALARIM',
-                      style: TextStyle(
-                        color: Color(0xFF527DAA),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'OpenSans',
+                  SizedBox(
+                    width: 275,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: ()
+                      {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> myEncryptedFilesScreen(token: widget.token)));
+                      },
+                      child: const Text(
+                        'ŞİFRELİ DOSYALARIM',
+                        style: TextStyle(
+                          color: Color(0xFF527DAA),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(
-                  width: 275,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: ()
-                    {
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=> myDecryptedFilesScreen(token: widget.token,)));
-                    },
-                    child: const Text(
-                      'ÇÖZÜLMÜŞ DOSYALARIM',
-                      style: TextStyle(
-                        color: Color(0xFF527DAA),
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: 'OpenSans',
+                  SizedBox(
+                    width: 275,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: ()
+                      {
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> myDecryptedFilesScreen(token: widget.token,)));
+                      },
+                      child: const Text(
+                        'ÇÖZÜLMÜŞ DOSYALARIM',
+                        style: TextStyle(
+                          color: Color(0xFF527DAA),
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'OpenSans',
+                        ),
                       ),
                     ),
                   ),
-                ),
-                //_buildFilePreview(),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

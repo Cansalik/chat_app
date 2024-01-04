@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../service/API.dart';
 import 'package:http/http.dart' as http;
 
@@ -130,7 +131,7 @@ class _myEncryptedPhotosState extends State<myEncryptedPhotos> {
                             children: [
                               Text(photoList[index]['title'],style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
                               SizedBox(height: 5,),
-                              Text(photoList[index]['createdAt'],style: TextStyle(fontSize: 16,color: Colors.blue),),
+                              Text("${DateFormat('dd.MM.yyyy HH:mm').format(DateTime.parse(photoList[index]['createdAt']))}",style: TextStyle(fontSize: 16,color: Colors.blue),),
                             ],
                           ),
                         ),
